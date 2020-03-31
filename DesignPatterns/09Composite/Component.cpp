@@ -23,5 +23,5 @@ void Component::Remove(Component* obj)
 
 Component* Component::GetChild(int index)
 {
-	return 0;
+	return nullptr;
 }

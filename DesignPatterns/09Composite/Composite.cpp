@@ -39,5 +39,8 @@ void Composite::Remove(Component* obj)
 
 Component* Composite::GetChild(int index)
 {
+	if (index < 0 || index > (int)m_vecComponent.size())
+		return nullptr;
+
 	return m_vecComponent[index];
 }
