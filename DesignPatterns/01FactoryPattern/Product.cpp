@@ -4,11 +4,13 @@
 
 Product::Product()
 {
+
 }
 
 
 Product::~Product()
 {
+
 }
 
 
@@ -20,4 +22,5 @@ ConcreteProduct::ConcreteProduct()
 
 ConcreteProduct::~ConcreteProduct()
 {
+
 }
