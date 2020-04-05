@@ -36,8 +36,12 @@
 
 
 /* 
- *   解释器模式--示例
- *   使用解释器模式解释表达式'a-b+c'
+ *   解释器模式--使用示例
+ *   解释表达式'LOOP 2 PRINT 杨过 SPACE SPACE PRINT 小龙女 BREAK END PRINT 郭靖 SPACE SPACE PRINT 黄蓉'
+ *   输出：
+ *       杨过  小龙女
+ *       杨过  小龙女
+ *       郭靖  黄蓉
  *
  */
 
@@ -54,6 +58,7 @@ public:
 
 	std::string GetCurrentCommand() const;
 	void NextCommand();
+	int GetLoopNumber();
 
 protected:
 	void SplitString(const std::string& strText);	// 默认以空格为分割符
@@ -76,26 +81,41 @@ public:
 	virtual void execute() = 0;
 };
 
-// 终结符表达式，解释执行基本指令
-class TerminalExpression : public Expression
+// 指令集合(非终结符表达式)，解释Context生成各个指令
+class CommandSet : public Expression
 {
 public:
-	TerminalExpression();
-	~TerminalExpression();
+	CommandSet();
+	~CommandSet();
 
 	void interpret(Context* context);
 	void execute();
 
 private:
-	std::string m_strCommand;
-	std::string m_strText;
+	std::list<Expression*> m_listCommands;
 };
 
-class LoopExpression : public Expression
+// 单条指令(非终结符表达式)，包括LoopCommand和PrimitiveCommand
+class Command : public Expression
 {
 public:
-	LoopExpression();
-	~LoopExpression();
+	Command();
+	~Command();
+
+	void interpret(Context* context);
+	void execute();
+
+private:
+	Expression* m_pCommand;
+};
+
+
+// 循环指令(非终结符表达式)，解释执行循环命令
+class LoopCommand : public Expression
+{
+public:
+	LoopCommand();
+	~LoopCommand();
 
 	void interpret(Context* context);
 	void execute();
@@ -105,8 +125,23 @@ private:
 	int m_nNumber;	// 循环次数
 };
 
+// 元指令(终结符表达式)，解释执行基本指令
+class PrimitiveCommand : public Expression
+{
+public:
+	PrimitiveCommand();
+	~PrimitiveCommand();
+
+	void interpret(Context* context);
+	void execute();
+
+private:
+	std::string m_strCommand;
+	std::string m_strText;
+};
 
 
+// --------------------------------------------------
 
 Context::Context(const std::string& strText)
 {
@@ -135,6 +170,13 @@ void Context::NextCommand()
 	{
 		m_strCurrentCommand = "";
 	}
+}
+
+int Context::GetLoopNumber()
+{
+	int number = 0;
+	number = atoi(m_strCurrentCommand.c_str());
+	return number;
 }
 
 void Context::SplitString(const std::string& strText)
@@ -166,18 +208,120 @@ Expression::~Expression()
 
 }
 
-
-TerminalExpression::TerminalExpression()
+CommandSet::CommandSet()
 {
 
 }
 
-TerminalExpression::~TerminalExpression()
+CommandSet::~CommandSet()
+{
+	std::list<Expression*>::iterator it = m_listCommands.begin();
+	for (; it != m_listCommands.end(); ++it)
+	{
+		SAFE_DELETE(*it);
+	}
+}
+
+void CommandSet::interpret(Context* context)
+{
+	while (true)
+	{
+		if (context->GetCurrentCommand() == "")	// context为空
+		{
+			break;
+		}
+		else if (context->GetCurrentCommand() == "END")	// 不解释END
+		{
+			context->NextCommand();
+			break;
+		}
+		else
+		{
+			Expression* pCommand = new Command();
+			pCommand->interpret(context);
+			m_listCommands.push_back(pCommand);
+		}
+	}
+}
+
+void CommandSet::execute()
+{
+	std::list<Expression*>::iterator it = m_listCommands.begin();
+	for (; it != m_listCommands.end(); ++it)
+	{
+		(*it)->execute();
+	}
+}
+
+Command::Command() : m_pCommand(nullptr)
 {
 
 }
 
-void TerminalExpression::interpret(Context* context)
+Command::~Command()
+{
+	SAFE_DELETE(m_pCommand);
+}
+
+void Command::interpret(Context* context)
+{
+	if (context->GetCurrentCommand() == "LOOP")
+	{
+		m_pCommand = new LoopCommand();
+		m_pCommand->interpret(context);
+	}
+	else
+	{
+		m_pCommand = new PrimitiveCommand();
+		m_pCommand->interpret(context);
+	}
+}
+
+void Command::execute()
+{
+	m_pCommand->execute();
+}
+
+LoopCommand::LoopCommand() : m_pExpression(nullptr)
+{
+
+}
+
+LoopCommand::~LoopCommand()
+{
+	SAFE_DELETE(m_pExpression);
+}
+
+void LoopCommand::interpret(Context* context)
+{
+	context->NextCommand(); // 跳过"LOOP"
+	m_nNumber = context->GetLoopNumber();
+	context->NextCommand();	// 跳过number
+
+	m_pExpression = new CommandSet();
+	m_pExpression->interpret(context);
+}
+
+void LoopCommand::execute()
+{
+	for (int i = 0; i < m_nNumber; ++i)
+	{
+		m_pExpression->execute();
+	}
+}
+
+
+PrimitiveCommand::PrimitiveCommand()
+{
+
+}
+
+PrimitiveCommand::~PrimitiveCommand()
+{
+
+}
+
+void PrimitiveCommand::interpret(Context* context)
 {
 	m_strCommand = context->GetCurrentCommand();
 	context->NextCommand();
@@ -189,7 +333,7 @@ void TerminalExpression::interpret(Context* context)
 	}
 }
 
-void TerminalExpression::execute()
+void PrimitiveCommand::execute()
 {
 	if (m_strCommand == "PRINT")
 	{
@@ -201,29 +345,20 @@ void TerminalExpression::execute()
 	}
 	else if (m_strCommand == "BREAK")
 	{
-
+		std::cout << std::endl;
 	}
 }
 
-LoopExpression::LoopExpression()
+
+
+int main()
 {
+	std::string text = "LOOP 2 PRINT 杨过 SPACE SPACE PRINT 小龙女 BREAK END PRINT 郭靖 SPACE SPACE PRINT 黄蓉";
+	Context* pContext = new Context(text);
 
-}
+	Expression* pExpression = new CommandSet();
+	pExpression->interpret(pContext);
+	pExpression->execute();
 
-LoopExpression::~LoopExpression()
-{
-
-}
-
-void LoopExpression::interpret(Context* context)
-{
-
-}
-
-void LoopExpression::execute()
-{
-	for (int i = 0; i < m_nNumber; ++i)
-	{
-		m_pExpression->execute();
-	}
+	return 0;
 }
