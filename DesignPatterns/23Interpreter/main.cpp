@@ -37,8 +37,9 @@
 
 /* 
  *   解释器模式--使用示例
- *   解释表达式'LOOP 2 PRINT 杨过 SPACE SPACE PRINT 小龙女 BREAK END PRINT 郭靖 SPACE SPACE PRINT 黄蓉'
+ *   解释表达式'LOOP 3 PRINT 杨过 SPACE SPACE PRINT 小龙女 ENTER END PRINT 郭靖 SPACE SPACE PRINT 黄蓉'
  *   输出：
+ *       杨过  小龙女
  *       杨过  小龙女
  *       杨过  小龙女
  *       郭靖  黄蓉
@@ -49,69 +50,70 @@
 #include <string>
 #include <list>
 
-// 上下文类，提供了处理指令的方法
 class Context
 {
 public:
 	Context(const std::string& strText);
 	~Context();
 
-	std::string GetCurrentCommand() const;
+	std::string GetCurrentCommand();
 	void NextCommand();
 	int GetLoopNumber();
 
 protected:
-	void SplitString(const std::string& strText);	// 默认以空格为分割符
+	void SplitString(const std::string& strText, const std::string c = " ");
 
 private:
-	std::list<std::string> m_listCommandSet;	// 经过处理后的指令集合
-	std::string m_strCurrentCommand;			// 记录当前的单个指令
+	std::string m_strCurrentCommand;
+	std::list<std::string> m_listCommand;
 };
 
 // 抽象表达式
-class Expression
+class AbstractExpression
 {
 protected:
-	Expression();
+	AbstractExpression();
 
 public:
-	virtual ~Expression();
+	virtual ~AbstractExpression();
 
 	virtual void interpret(Context* context) = 0;
 	virtual void execute() = 0;
 };
 
-// 指令集合(非终结符表达式)，解释Context生成各个指令
-class CommandSet : public Expression
+
+// 代码块(非终结符表达式)，解释context并生成每条指令
+class CodeBlock : public AbstractExpression
 {
 public:
-	CommandSet();
-	~CommandSet();
+	CodeBlock();
+	~CodeBlock();
 
 	void interpret(Context* context);
 	void execute();
 
 private:
-	std::list<Expression*> m_listCommands;
+	std::list<AbstractExpression*> m_listCodeBlock;
 };
 
-// 单条指令(非终结符表达式)，包括LoopCommand和PrimitiveCommand
-class Command : public Expression
+
+// 单条指令(非终结符表达式)，解释生成LoopCommand或PrimitiveCommand
+class CommandExpression : public AbstractExpression
 {
 public:
-	Command();
-	~Command();
+	CommandExpression();
+	~CommandExpression();
 
 	void interpret(Context* context);
 	void execute();
 
 private:
-	Expression* m_pCommand;
+	AbstractExpression* m_pCommand;
 };
 
 
-// 循环指令(非终结符表达式)，解释执行循环命令
-class LoopCommand : public Expression
+// 循环指令(非终结符表达式)，解释执行循环指令
+class LoopCommand : public AbstractExpression
 {
 public:
 	LoopCommand();
@@ -121,12 +123,13 @@ public:
 	void execute();
 
 private:
-	Expression* m_pExpression;
-	int m_nNumber;	// 循环次数
+	int m_nNumber;						// 循环次数
+	AbstractExpression* m_pCodeBlock;	// 循环主体
 };
 
+
 // 元指令(终结符表达式)，解释执行基本指令
-class PrimitiveCommand : public Expression
+class PrimitiveCommand : public AbstractExpression
 {
 public:
 	PrimitiveCommand();
@@ -141,12 +144,14 @@ private:
 };
 
 
-// --------------------------------------------------
+
+//------------------------------------------------------
+
 
 Context::Context(const std::string& strText)
 {
 	SplitString(strText);
-	NextCommand();	// 指向第一条指令
+	NextCommand();	//指向第一条指令
 }
 
 Context::~Context()
@@ -154,17 +159,17 @@ Context::~Context()
 
 }
 
-std::string Context::GetCurrentCommand() const
+std::string Context::GetCurrentCommand()
 {
 	return m_strCurrentCommand;
 }
 
 void Context::NextCommand()
 {
-	if (!m_listCommandSet.empty())
+	if (!m_listCommand.empty())
 	{
-		m_strCurrentCommand = m_listCommandSet.front();
-		m_listCommandSet.pop_front();
+		m_strCurrentCommand = m_listCommand.front();
+		m_listCommand.pop_front();
 	}
 	else
 	{
@@ -179,91 +184,96 @@ int Context::GetLoopNumber()
 	return number;
 }
 
-void Context::SplitString(const std::string& strText)
+void Context::SplitString(const std::string& strText, const std::string c)
 {
 	std::string::size_type pos1 = 0;
 	std::string::size_type pos2;
 
-	while ((pos2 = strText.find(" ", pos1)) != std::string::npos)
+	while ((pos2 = strText.find(c, pos1)) != std::string::npos)
 	{
-		m_listCommandSet.push_back(strText.substr(pos1, pos2 - pos1));
-		pos1 = pos2 + 1;
+		m_listCommand.push_back(strText.substr(pos1, pos2 - pos1));
+		pos1 = pos2 + c.size();
 	}
 
-	// 最后一个
-	if (pos1 != strText.length())
+	// 最后一部分
+	if (pos1 != strText.size())
 	{
-		m_listCommandSet.push_back(strText.substr(pos1));
+		m_listCommand.push_back(strText.substr(pos1));
 	}
 }
 
 
-Expression::Expression()
+AbstractExpression::AbstractExpression()
 {
 
 }
 
-Expression::~Expression()
+AbstractExpression::~AbstractExpression()
 {
 
 }
 
-CommandSet::CommandSet()
+
+CodeBlock::CodeBlock()
 {
 
 }
 
-CommandSet::~CommandSet()
+CodeBlock::~CodeBlock()
 {
-	std::list<Expression*>::iterator it = m_listCommands.begin();
-	for (; it != m_listCommands.end(); ++it)
+	std::list<AbstractExpression*>::iterator it = m_listCodeBlock.begin();
+	for (; it != m_listCodeBlock.end(); ++it)
 	{
 		SAFE_DELETE(*it);
 	}
 }
 
-void CommandSet::interpret(Context* context)
+void CodeBlock::interpret(Context* context)
 {
 	while (true)
 	{
-		if (context->GetCurrentCommand() == "")	// context为空
+		if (context->GetCurrentCommand() == "") // context为空
 		{
 			break;
 		}
-		else if (context->GetCurrentCommand() == "END")	// 不解释END
+		else if (context->GetCurrentCommand() == "END") // 不解释END
 		{
 			context->NextCommand();
 			break;
 		}
 		else
 		{
-			Expression* pCommand = new Command();
-			pCommand->interpret(context);
-			m_listCommands.push_back(pCommand);
+			// 生成一条指令
+			AbstractExpression* pCommandExpression = new CommandExpression();
+			pCommandExpression->interpret(context);
+
+			m_listCodeBlock.push_back(pCommandExpression);
 		}
 	}
 }
 
-void CommandSet::execute()
+void CodeBlock::execute()
 {
-	std::list<Expression*>::iterator it = m_listCommands.begin();
-	for (; it != m_listCommands.end(); ++it)
+	// 执行每条指令
+	std::list<AbstractExpression*>::iterator it = m_listCodeBlock.begin();
+	for (; it != m_listCodeBlock.end(); ++it)
 	{
 		(*it)->execute();
 	}
 }
 
-Command::Command() : m_pCommand(nullptr)
+
+CommandExpression::CommandExpression() : m_pCommand(nullptr)
 {
 
 }
 
-Command::~Command()
+CommandExpression::~CommandExpression()
 {
 	SAFE_DELETE(m_pCommand);
 }
 
-void Command::interpret(Context* context)
+void CommandExpression::interpret(Context* context)
 {
 	if (context->GetCurrentCommand() == "LOOP")
 	{
@@ -277,36 +287,38 @@ void Command::interpret(Context* context)
 	}
 }
 
-void Command::execute()
+void CommandExpression::execute()
 {
 	m_pCommand->execute();
 }
 
-LoopCommand::LoopCommand() : m_pExpression(nullptr)
+
+LoopCommand::LoopCommand() : m_pCodeBlock(nullptr)
 {
 
 }
 
 LoopCommand::~LoopCommand()
 {
-	SAFE_DELETE(m_pExpression);
+	SAFE_DELETE(m_pCodeBlock);
 }
 
 void LoopCommand::interpret(Context* context)
 {
-	context->NextCommand(); // 跳过"LOOP"
+	context->NextCommand();	// 跳过LOOP
 	m_nNumber = context->GetLoopNumber();
-	context->NextCommand();	// 跳过number
+	context->NextCommand();	// 跳过Number
 
-	m_pExpression = new CommandSet();
-	m_pExpression->interpret(context);
+	// 生成循环主体
+	m_pCodeBlock = new CodeBlock();
+	m_pCodeBlock->interpret(context);
 }
 
 void LoopCommand::execute()
 {
 	for (int i = 0; i < m_nNumber; ++i)
 	{
-		m_pExpression->execute();
+		m_pCodeBlock->execute();
 	}
 }
 
@@ -343,22 +355,24 @@ void PrimitiveCommand::execute()
 	{
 		std::cout << " ";
 	}
-	else if (m_strCommand == "BREAK")
+	else if (m_strCommand == "ENTER")
 	{
 		std::cout << std::endl;
 	}
 }
 
 
-
 int main()
 {
-	std::string text = "LOOP 2 PRINT 杨过 SPACE SPACE PRINT 小龙女 BREAK END PRINT 郭靖 SPACE SPACE PRINT 黄蓉";
+	std::string text = "LOOP 3 PRINT 杨过 SPACE SPACE PRINT 小龙女 ENTER END PRINT 郭靖 SPACE SPACE PRINT 黄蓉";
 	Context* pContext = new Context(text);
 
-	Expression* pExpression = new CommandSet();
-	pExpression->interpret(pContext);
-	pExpression->execute();
+	AbstractExpression* pCodeBlock = new CodeBlock();
+	pCodeBlock->interpret(pContext);
+	pCodeBlock->execute();
+
+	SAFE_DELETE(pCodeBlock);
+	SAFE_DELETE(pContext);
 
 	return 0;
 }
