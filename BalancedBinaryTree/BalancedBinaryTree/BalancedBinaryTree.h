@@ -18,16 +18,29 @@ typedef struct BinarySortTreeNode
 } BSTNode;
 
 /*
- *	@brief	对以*root为根节点的二叉排序树作左旋转处理
- *	@param	[in/out]root	旋转之后root指向新的根节点
+ *	@brief	对以T为根节点的二叉排序树作左旋转处理
+ *	@param	[in/out]T	旋转之后T指向新的根节点
  */
-void L_Rotate(BSTNode* &root);
+void L_Rotate(BSTNode* &T);
 
 /*
- *	@brief	对以*root为根节点的二叉排序树作右旋转处理
- *	@param	[in/out]root	旋转之后root指向新的根节点
+ *	@brief	对以T为根节点的二叉排序树作右旋转处理
+ *	@param	[in/out]T	旋转之后T指向新的根节点
  */
-void R_Rotate(BSTNode* &root);
+void R_Rotate(BSTNode* &T);
+
+/*
+ *	@brief	判断在T的左子树插入的新结点的位置，选择平衡类型
+ *	@param	[in/out]T	旋转之后T指向新的根节点
+ */
+void LeftBalance(BSTNode* &T);
+
+/*
+ *	@brief	判断在T的右子树插入的新结点的位置，选择平衡类型
+ *	@param	[in/out]T	旋转之后T指向新的根节点
+ */
+void RightBalance(BSTNode* &T);
+
 
 /*
  *	@brief	若平衡的二叉排序树T中不存在和e相同的结点，则插入一个数据元素为e的新结点。
