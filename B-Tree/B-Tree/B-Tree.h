@@ -2,7 +2,7 @@
 
 #define m 3	// B-树的阶
 
-typedef int KeyType;
+typedef int KeyType;	// 关键字类型
 
 typedef struct BTreeNode
 {
