@@ -47,3 +47,49 @@ Result SearchBTree(BTNode* T, KeyType k)
 
 	return res;
 }
+
+void InsertBTNode(BTNode* &p, int i, int k, BTNode* q)
+{
+	int j;
+	for (j = p->keynum; j > i; --j)
+	{
+		p->key[j + 1] = p->key[j];
+		p->ptr[j + 1] = p->ptr[j];
+	}
+
+	p->key[i + 1] = k;
+	p->ptr[i + 1] = q;
+
+	if (q != nullptr)
+	{
+		q->parent = p;
+	}
+
+	++p->keynum;
+}
+
+void SplitBTNode(BTNode* &p, BTNode* &q)
+{
+	int i;
+	int s = (m + 1) / 2;
+	q = new BTNode();
+
+	q->ptr[0] = p->ptr[s];
+	for (i = s + 1; i <= m; ++i)
+	{
+		q->key[i - s] = p->key[i];
+		q->ptr[i - s] = p->ptr[i];
+	}
+
+	q->keynum = p->keynum - s;
+	q->parent = p->parent;
+	for (i = 0; i <= p->keynum - s; ++i)
+	{
+		if (q->ptr[i] != nullptr)
+		{
+			q->ptr[i]->parent = q;
+		}
+	}
+
+	p->keynum = s - 1;
+}
