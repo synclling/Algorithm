@@ -20,9 +20,19 @@ typedef struct Result
 } Result;
 
 /*
- *	@brief	在m阶的B-树上查找关键字k，返回结果(pt, i, tag)
+ *	@brief	在m阶的B-树T上查找关键字k，返回结果(pt, i, tag)
  *	@param	[in]T		B-树
  *	@param	[in]k		关键字k
- *	@return 查找成功tag = 1，指针pt所指结点中的第i个关键字等于k；否则tag = 0。
+ *	@return 查找成功tag = 1，指针pt所指结点中的第i个关键字等于k；否则tag = 0
  */
 Result SearchBTree(BTNode* T, KeyType k);
+
+/*
+ *	@brief	在m阶的B-树T上的q结点的key[i]和key[i + 1]之间插入关键字k
+ *	@param	[in]T		B-树
+ *	@param	[in]k		关键字k
+ *	@param	[in]q		结点q
+ *	@param	[in]i		关键字位置i
+ *	@return 插入成功返回1
+ */
+int InsertBTree(BTNode* &T, KeyType k, BTNode* &q, int i)
