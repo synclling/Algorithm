@@ -35,4 +35,12 @@ Result SearchBTree(BTNode* T, KeyType k);
  *	@param	[in]i		关键字位置i
  *	@return 插入成功返回1
  */
-int InsertBTree(BTNode* &T, KeyType k, BTNode* &q, int i)
+int InsertBTree(BTNode* &T, KeyType k, BTNode* q, int i);
+
+/*
+ *	@brief	在m阶的B-树T上删除关键字k
+ *	@param	[in]T		B-树
+ *	@param	[in]k		关键字k
+ *	@return 删除成功返回1，失败返回0
+ */
+int DeleteBTree(BTNode* &T, KeyType k);
