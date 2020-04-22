@@ -133,7 +133,7 @@ int InsertBTree(BTNode* &T, KeyType k, BTNode* q, int i)
 		}
 		else
 		{
-			int s = (m + 1) / 2; // 向上取整[m/2]
+			int s = (m + 1) / 2; // 向上取整⌈m / 2⌉
 			Split(q, s, ap); // 将q->key[s + 1...m], q->ptr[s...m]插入到新结点ap
 			
 			x = q->key[s];
@@ -153,18 +153,6 @@ int InsertBTree(BTNode* &T, KeyType k, BTNode* q, int i)
 	return 1;
 }
 
-void Successor(BTNode* &p, int i)
-{
-	BTNode* child = p->ptr[i];
-	while (child->ptr[0] != nullptr)
-	{
-		child = child->ptr[0];
-	}
-
-	p->key[i] = child->key[1];
-	
-	p = child;
-}
 
 void Remove(BTNode* &p, int i)
 {
@@ -177,19 +165,121 @@ void Remove(BTNode* &p, int i)
 	--p->keynum;
 }
 
+void Restore(BTNode* &T, BTNode* p, int i)
+{
+	BTNode* ap = p->parent;
+	if (ap == nullptr)
+	{
+
+	}
+
+	BTNode* lc = nullptr;
+	BTNode* rc = nullptr;
+	bool finished = false;
+	while (!finished)
+	{
+		int r = 0;
+		while (ap->ptr[r] != p) ++r;
+		if (r == 0)
+		{
+			lc = nullptr;
+			rc = ap->ptr[r + 1];
+		}
+		else if (r == ap->keynum)
+		{
+			lc = ap->ptr[r - 1];
+			rc = nullptr;
+		}
+		else
+		{
+			lc = ap->ptr[r - 1];
+			rc = ap->ptr[r + 1];
+		}
+
+		if (r > 0 && lc != nullptr && lc->keynum > ((m - 1) / 2)) // 向左兄弟借关键字
+		{
+			for (int j = p->keynum; j >= 1; --j) // 关键字和指针向量向后移动
+			{
+				p->key[j + 1] = p->key[j];
+				p->ptr[j + 1] = p->ptr[j];
+			}
+			p->ptr[1] = p->ptr[0]; // A0指针移动A1位置
+			
+			p->key[1] = ap->key[r]; // 双亲结点的关键字移到p
+			p->ptr[0] = lc->ptr[lc->keynum];
+			if (p->ptr[0] != nullptr)
+			{
+				p->ptr[0]->parent = p; // 更新p的孩子结点的父域指针
+			}
+
+			ap->key[r] = lc->key[lc->keynum]; // 左兄弟的关键字上移到双亲结点
+
+			++p->keynum;
+			--lc->keynum;
+
+			finished = true;
+			break;
+		}
+		else if (r < ap->keynum && rc != nullptr && rc->keynum >((m - 1) / 2)) // 向右兄弟借关键字
+		{
+			p->key[p->keynum + 1] = ap->key[r + 1];
+			p->ptr[p->keynum + 1] = rc->ptr[0];
+			if (p->ptr[p->keynum + 1] != nullptr)
+			{
+				p->ptr[p->keynum + 1]->parent = p;
+			}
+
+			ap->key[r + 1] = rc->key[1];
+
+			rc->ptr[0] = rc->ptr[1];
+			for (int j = 1; j < rc->keynum; ++j)
+			{
+				rc->key[j] = rc->key[j + 1];
+				rc->ptr[j] = rc->ptr[j + 1];
+			}
+
+			++p->keynum;
+			--rc->keynum;
+
+			finished = true;
+			break;
+		}
+		else if (r > 0 && lc != nullptr && lc->keynum <= ((m - 1) / 2)) // 左兄弟关键字不足借，向左兄弟靠拢合并
+		{
+
+		}
+		else if (r < ap->keynum && rc != nullptr && rc->keynum <= ((m - 1) / 2)) // 右兄弟关键字不足借，向右兄弟靠拢合并
+		{
+
+		}
+	}
+}
+
 void DeleteBTNode(BTNode* &T, BTNode* p, int i)
 {
 	if (p->ptr[i] != nullptr) // 待删除关键字所在的结点为非终端结点
 	{
-		Successor(p, i);
-		DeleteBTNode(T, p, 1);
+		BTNode* child = p->ptr[i];
+		while (child->ptr[0] != nullptr)
+		{
+			child = child->ptr[0];
+		}
+		p->key[i] = child->key[1];
+
+		DeleteBTNode(T, child, 1);
 	}
-	else // 待删除关键字所在的结点为终端结点
+	else // 待删除关键字所在的结点为最下面一层的非终端结点
 	{
 		Remove(p, i);
-		//if (p->keynum < (m - 1) / 2) // 删除后关键字数目少于
-		//{
-		//}
+		// B-Tree的关键字临界点为⌈m / 2⌉ - 1，等价于(m - 1) / 2
+		if (p->keynum >= ((m - 1) / 2))
+		{
+			// 删除之后大于等于临界点，无须操作
+		}
+		else if (p->keynum < ((m - 1) / 2)) // 删除之后关键字数目少于临界点
+		{
+			Restore(T, p, i);
+		}
 	}
 }
 
