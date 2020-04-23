@@ -246,12 +246,63 @@ void Restore(BTNode* &T, BTNode* p, int i)
 		}
 		else if (r > 0 && lc != nullptr && lc->keynum <= ((m - 1) / 2)) // 左兄弟关键字不足借，向左兄弟靠拢合并
 		{
+			for (int j = p->keynum; j >= 1; --j) // 关键字和指针向量向后移动
+			{
+				p->key[j + 1] = p->key[j];
+				p->ptr[j + 1] = p->ptr[j];
+			}
+			p->ptr[1] = p->ptr[0]; // A0指针移动A1位置
 
+			p->key[1] = ap->key[r]; // 合并双亲结点的关键字
+			++p->keynum;
+
+			for (int j = 1; j <= p->keynum; ++j) // 更新p的孩子结点的父域指针
+			{
+				if (p->ptr[j] != nullptr)
+				{
+					p->ptr[j]->parent = lc;
+				}
+			}
+
+			for (int j = 1; j <= p->keynum; ++j) // 将p结点的关键字合并到左兄弟
+			{
+				lc->key[lc->keynum + j] = p->key[j];
+				lc->ptr[lc->keynum + j] = p->ptr[j];
+			}
+			lc->keynum += p->keynum;
+
+			for (int j = r; j < ap->keynum; ++j) // 双亲结点关键字与指针向左移动一位
+			{
+				ap->key[j] = ap->key[j + 1];
+				ap->ptr[j] = ap->ptr[j + 1];
+			}
+			//ap->ptr[0] = lc; // 重新指向lc
+			--ap->keynum;
+
+			delete p; // 删除p结点
+			p = lc;
 		}
 		else if (r < ap->keynum && rc != nullptr && rc->keynum <= ((m - 1) / 2)) // 右兄弟关键字不足借，向右兄弟靠拢合并
 		{
 
 		}
+
+
+		if (ap->keynum >= ((m - 1) / 2) || (ap->parent == nullptr && ap->keynum > 0))
+		{
+			finished = true;
+		}
+		else if (ap->parent == nullptr && ap->keynum <= 0) // 出现空的根结点
+		{
+			T = p; // 根结点下移
+			delete ap;
+			ap = nullptr;
+
+			finished = true;
+			break;
+		}
+		ap = ap->parent;
+		p = p->parent;
 	}
 }
 
