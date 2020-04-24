@@ -170,7 +170,9 @@ void Restore(BTNode* &T, BTNode* p, int i)
 	BTNode* ap = p->parent;
 	if (ap == nullptr)
 	{
-
+		delete p;
+		T = nullptr;
+		return;
 	}
 
 	BTNode* lc = nullptr;
@@ -276,7 +278,7 @@ void Restore(BTNode* &T, BTNode* p, int i)
 				ap->key[j] = ap->key[j + 1];
 				ap->ptr[j] = ap->ptr[j + 1];
 			}
-			//ap->ptr[0] = lc; // 重新指向lc
+			ap->ptr[0] = lc; // 重新指向lc
 			--ap->keynum;
 
 			delete p; // 删除p结点
@@ -284,7 +286,42 @@ void Restore(BTNode* &T, BTNode* p, int i)
 		}
 		else if (r < ap->keynum && rc != nullptr && rc->keynum <= ((m - 1) / 2)) // 右兄弟关键字不足借，向右兄弟靠拢合并
 		{
+			p->key[p->keynum + 1] = ap->key[r + 1]; // 合并双亲结点的关键字
+			p->ptr[p->keynum + 1] = rc->ptr[0];
+			++p->keynum;
 
+			for (int j = 1; j <= rc->keynum; ++j) // 右兄弟结点的关键字与指针向后移动p->keynum个位置
+			{
+				rc->key[p->keynum + j] = rc->key[j];
+				rc->ptr[p->keynum + j] = rc->ptr[j];
+			}
+
+			for (int j = 1; j <= p->keynum; ++j) // 将p结点的关键字与指针移到右兄弟
+			{
+				rc->key[j] = p->key[j];
+				rc->ptr[j] = p->ptr[j];
+			}
+			rc->ptr[0] = p->ptr[0];
+			rc->keynum += p->keynum;
+
+			for (int j = 0; j <= rc->keynum; ++j)
+			{
+				if (rc->ptr[j] != nullptr)
+				{
+					rc->ptr[j]->parent = rc;
+				}
+			}
+
+			for (int j = r + 1; j < ap->keynum; ++j)
+			{
+				ap->key[j] = ap->key[j + 1];
+				ap->ptr[j] = ap->ptr[j + 1];
+			}
+			ap->ptr[r] = rc;
+			--ap->keynum;
+
+			delete p;
+			p = rc;
 		}
 
 
@@ -301,6 +338,7 @@ void Restore(BTNode* &T, BTNode* p, int i)
 			finished = true;
 			break;
 		}
+
 		ap = ap->parent;
 		p = p->parent;
 	}
