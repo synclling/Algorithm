@@ -1,31 +1,35 @@
 ﻿#pragma once
 
-typedef struct RBTreeNode
+typedef struct rbtree_node
 {
-	int key;
-	char data;
-	char color;
-	struct RBTreeNode *left;
-	struct RBTreeNode *right;
-	struct RBTreeNode *parent;
-} RBTreeNode;
+	unsigned int		key;
+	struct rbtree_node *left;
+	struct rbtree_node *right;
+	struct rbtree_node *parent;
+	char				color;
+	char				data;
+} rbtree_node;
 
-typedef void(*RBTreeInsert)(RBTreeNode *root, RBTreeNode *node, RBTreeNode *sentinel);
+typedef void(*rbtree_insert_pt)(rbtree_node *root, rbtree_node *node, rbtree_node *sentinel);
 
-typedef struct RBTree
+typedef struct rbtree
 {
-	RBTreeNode *root;
-	RBTreeNode *sentinel;
-	RBTreeInsert insert;
-} RBTree;
+	rbtree_node *root;
+	rbtree_node *sentinel;
+	rbtree_insert_pt insert;
+} rbtree;
 
-#define RBTree_Red(node)			((node)->color = 1)
-#define RBTree_Black(node)			((node)->color = 0)
-#define RBTree_Is_Red(node)			((node)->color)
-#define RBTree_Is_Black(node)		(!RBTree_Is_Red(node))
-#define RBTree_Sentinel_Init(node)	RBTree_Black(node)	// a sentinel must be black
-#define RBTree_Init(tree, s, i)		\
-	RBTree_Sentinel_Init(s);		\
-	(tree)->root = s;				\
-	(tree)->sentinel = s;			\
-	(tree)->insert = i;
+
+#define rbt_red(node)			((node)->color = 1)
+#define rbt_black(node)			((node)->color = 0)
+#define rbt_is_red(node)		((node)->color)
+#define rbt_is_black(node)		(!rbt_is_red(node))
+
+/* a sentinel must be black */
+#define rbtree_sentinel_init(node)		rbt_black(node)
+
+#define rbtree_init(tree, s, i)			\
+	rbtree_sentinel_init(s);			\
+	(tree)->root = s;					\
+	(tree)->sentinel = s;				\
+	(tree)->insert = i;					\
