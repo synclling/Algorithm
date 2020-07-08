@@ -28,8 +28,8 @@ typedef struct rbtree
 /* a sentinel must be black */
 #define rbtree_sentinel_init(node)		rbt_black(node)
 
-#define rbtree_init(tree, s, i)			\
-	rbtree_sentinel_init(s);			\
-	(tree)->root = s;					\
-	(tree)->sentinel = s;				\
-	(tree)->insert = i;					\
+void rbtree_init(rbtree *tree, rbtree_node *s, rbtree_insert_pt i);
+
+void rbtree_insert(rbtree *tree, rbtree_node *node);
+
+void rbtree_delete(rbtree *tree, rbtree_node *node);
