@@ -5,6 +5,8 @@ static inline void rbtree_left_rotate(rbtree_node **root, rbtree_node *sentinel,
 
 static inline void rbtree_right_rotate(rbtree_node **root, rbtree_node *sentinel, rbtree_node *node);
 
+static inline rbtree_node *rbtree_min(rbtree_node *node, rbtree_node *sentinel);
+
 void rbtree_init(rbtree *tree, rbtree_node *s, rbtree_insert_pt i)
 {
 	rbtree_sentinel_init(s);
@@ -90,7 +92,67 @@ void rbtree_insert(rbtree *tree, rbtree_node *node)
 
 void rbtree_delete(rbtree *tree, rbtree_node *node)
 {
+	unsigned int red;
 
+	rbtree_node *subst, *temp, *w;
+
+	rbtree_node **root = &(tree->root);
+	rbtree_node *sentinel = tree->sentinel;
+
+	if (node->left == sentinel)
+	{
+		temp = node->right;
+		subst = node;
+	}
+	else if (node->right == sentinel)
+	{
+		temp = node->left;
+		subst = node;
+	}
+	else
+	{
+		subst = rbtree_min(node->right, sentinel);
+		if (subst->left != sentinel)
+		{
+			temp = subst->left;
+		}
+		else
+		{
+			temp = subst->right;
+		}
+	}
+
+	if (subst == *root)
+	{
+		*root = temp;
+		rbt_black(temp);
+
+		node->left = NULL;
+		node->right = NULL;
+		node->parent = NULL;
+		node->key = 0;
+
+		return;
+	}
+
+	red = rbt_is_red(subst);
+	if (subst == subst->parent->left)
+	{
+		subst->parent->left = temp;
+	}
+	else
+	{
+		subst->parent->right = temp;
+	}
+
+	if (subst == node)
+	{
+		temp->parent = subst->parent;
+	}
+	else
+	{
+
+	}
 }
 
 
@@ -153,4 +215,13 @@ static inline void rbtree_right_rotate(rbtree_node **root, rbtree_node *sentinel
 
 	temp->right = node;
 	node->parent = temp;
+}
+
+static inline rbtree_node *rbtree_min(rbtree_node *node, rbtree_node *sentinel)
+{
+	while (node && node->left != sentinel)
+	{
+		node = node->left;
+	}
+	return node;
 }
