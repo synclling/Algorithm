@@ -136,6 +136,7 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 	}
 
 	red = rbt_is_red(subst);
+
 	if (subst == subst->parent->left)
 	{
 		subst->parent->left = temp;
@@ -151,8 +152,126 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 	}
 	else
 	{
+		if (subst->parent == node)
+		{
+			temp->parent = subst;
+		}
+		else
+		{
+			temp->parent = subst->parent;
+		}
 
+		subst->left = node->left;
+		subst->right = node->right;
+		subst->parent = node->parent;
+
+		if (node == *root)
+		{
+			*root = subst;
+		}
+		else
+		{
+			if (node == node->parent->left)
+			{
+				node->parent->left = subst;
+			}
+			else
+			{
+				node->parent->right = subst;
+			}
+		}
+
+		if (subst->left != sentinel)
+		{
+			subst->left->parent = subst;
+		}
+
+		if (subst->right != sentinel)
+		{
+			subst->right->parent = subst;
+		}
 	}
+
+	node->left = NULL;
+	node->right = NULL;
+	node->parent = NULL;
+	node->key = 0;
+
+	if (red)
+	{
+		return;
+	}
+
+	while (temp != *root && rbt_is_black(temp))
+	{
+		if (temp == temp->parent->left)
+		{
+			w = temp->parent->right;
+
+			if (rbt_is_red(w))
+			{
+				rbt_black(w);
+				rbt_red(temp->parent);
+				rbtree_left_rotate(root, sentinel, temp->parent);
+				w = temp->parent->right;
+			}
+
+			if (rbt_is_black(w->left) && rbt_is_black(w->right))
+			{
+				rbt_red(w);
+				temp = temp->parent;
+			}
+			else
+			{
+				if (rbt_is_black(w->right))
+				{
+					rbt_black(w->left);
+					rbt_red(w);
+					rbtree_right_rotate(root, sentinel, w);
+					w = temp->parent->right;
+				}
+
+				rbt_black(temp->parent);
+				rbt_black(w->right);
+				rbtree_left_rotate(root, sentinel, temp->parent);
+				temp = *root;
+			}
+		}
+		else
+		{
+			w = temp->parent->left;
+
+			if (rbt_is_red(w))
+			{
+				rbt_black(w);
+				rbt_red(temp->parent);
+				rbtree_right_rotate(root, sentinel, temp->parent);
+				w = temp->parent->left;
+			}
+
+			if (rbt_is_black(w->left) && rbt_is_black(w->right))
+			{
+				rbt_red(w);
+				temp = temp->parent;
+			}
+			else
+			{
+				if (rbt_is_black(w->left))
+				{
+					rbt_black(w->right);
+					rbt_red(w);
+					rbtree_left_rotate(root, sentinel, w);
+					w = temp->parent->left;
+				}
+
+				rbt_black(temp->parent);
+				rbt_black(w->left);
+				rbtree_right_rotate(root, sentinel, temp->parent);
+				temp = *root;
+			}
+		}
+	}
+	rbt_black(temp);
 }
 
 
