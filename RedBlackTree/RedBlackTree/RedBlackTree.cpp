@@ -164,6 +164,7 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 		subst->left = node->left;
 		subst->right = node->right;
 		subst->parent = node->parent;
+		rbt_copy_color(subst, node);
 
 		if (node == *root)
 		{
@@ -231,6 +232,7 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 					w = temp->parent->right;
 				}
 
+				rbt_copy_color(w, temp->parent);
 				rbt_black(temp->parent);
 				rbt_black(w->right);
 				rbtree_left_rotate(root, sentinel, temp->parent);
@@ -264,6 +266,7 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 					w = temp->parent->left;
 				}
 
+				rbt_copy_color(w, temp->parent);
 				rbt_black(temp->parent);
 				rbt_black(w->left);
 				rbtree_right_rotate(root, sentinel, temp->parent);

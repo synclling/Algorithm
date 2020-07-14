@@ -24,6 +24,7 @@ typedef struct rbtree
 #define rbt_black(node)			((node)->color = 0)
 #define rbt_is_red(node)		((node)->color)
 #define rbt_is_black(node)		(!rbt_is_red(node))
+#define rbt_copy_color(n1, n2)	((n1)->color = (n2)->color)
 
 /* a sentinel must be black */
 #define rbtree_sentinel_init(node)		rbt_black(node)
