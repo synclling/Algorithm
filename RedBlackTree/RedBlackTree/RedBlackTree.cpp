@@ -144,7 +144,40 @@ void rbtree_delete(rbtree *tree, rbtree_node *node)
 	}
 	else if (subst->parent == node)
 	{
+		rbt_copy_color(subst, node);
 
+		subst->left = node->left;
+		if (subst->left != sentinel)
+		{
+			subst->left->parent = subst;
+		}
+
+		subst->parent = node->parent;
+		if (node == *root)
+		{
+			*root = subst;
+		}
+		else
+		{
+			if (node == node->parent->left)
+			{
+				node->parent->left = subst;
+			}
+			else
+			{
+				node->parent->right = subst;
+			}
+		}
+	}
+	else
+	{
+		rbt_copy_color(subst, node);
+
+		subst->left = node->left;
+		subst->right = node->right;
+
+
+		temp->parent = subst->parent;
 	}
 }
 
