@@ -2,10 +2,35 @@
 //
 
 #include <iostream>
+#include "FastestWay.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
+
+	const int n = 6;
+
+	int e1 = 2, e2 = 4;
+	int x1 = 3, x2 = 2;
+
+	int a1[n + 1] = { 0, 7, 9, 3, 4, 8, 4 };
+	int a2[n + 1] = { 0, 8, 5, 6, 4, 5, 7 };
+
+	int t1[n] = { 0, 2, 3, 1, 3, 4 };
+	int t2[n] = { 0, 2, 1, 2, 2, 1 };
+
+	int f1[n + 1] = { 0 };
+	int f2[n + 1] = { 0 };
+
+	int L1[n + 1] = { 0 };
+	int L2[n + 1] = { 0 };
+
+	int F, L;
+
+	fastest_way(e1, e2, x1, x2, a1, a2, t1, t2, f1, f2, L1, L2, n, F, L);
+	print_stations(L1, L2, n, F, L);
+
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
