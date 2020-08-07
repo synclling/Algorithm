@@ -3,6 +3,8 @@
 #include <malloc.h>
 #include <string.h>
 
+#include <stack>
+
 int lcs_length(char *str1, char *str2, int **c, int **b)
 {
 	int m = strlen(str1);
@@ -45,7 +47,7 @@ int lcs_length(char *str1, char *str2, int **c, int **b)
 	return c[m][n];
 }
 
-void print_lcs(char *str1, int **b, int i, int j)
+void print_lcs_recursively(char *str1, int **b, int i, int j)
 {
 	if (i == 0 || j == 0)
 		return;
@@ -62,6 +64,35 @@ void print_lcs(char *str1, int **b, int i, int j)
 	else
 	{
 		print_lcs(str1, b, i, j - 1);
+	}
+}
+
+void print_lcs(char *str1, int **b, int i, int j)
+{
+	std::stack<char> s;
+
+	while (i != 0 && j != 0)
+	{
+		if (b[i][j] == EQUAL)
+		{
+			s.push(str1[i - 1]);
+			--i;
+			--j;
+		}
+		else if (b[i][j] == UP)
+		{
+			--i;
+		}
+		else
+		{
+			--j;
+		}
+	}
+
+	while (!s.empty())
+	{
+		printf("%c", s.top());
+		s.pop();
 	}
 }
 
