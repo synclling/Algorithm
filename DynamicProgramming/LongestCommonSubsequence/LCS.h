@@ -7,6 +7,8 @@
 
 int lcs_length(char *str1, char *str2, int **c, int **b);
 
+void print_lcs_recursively(char *str1, int **b, int i, int j);
+
 void print_lcs(char *str1, int **b, int i, int j);
 
 void lcs(char *str1, char *str2);

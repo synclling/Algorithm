@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastestWay", "FastestWay\Fa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LongestCommonSubsequence", "LongestCommonSubsequence\LongestCommonSubsequence.vcxproj", "{BA5702A7-1B87-46B9-9F65-0EAA5A463813}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CollectingApples", "CollectingApples\CollectingApples.vcxproj", "{7E03CE25-F824-46E8-808F-D5E5FB4D8485}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{BA5702A7-1B87-46B9-9F65-0EAA5A463813}.Release|x64.Build.0 = Release|x64
 		{BA5702A7-1B87-46B9-9F65-0EAA5A463813}.Release|x86.ActiveCfg = Release|Win32
 		{BA5702A7-1B87-46B9-9F65-0EAA5A463813}.Release|x86.Build.0 = Release|Win32
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Debug|x64.ActiveCfg = Debug|x64
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Debug|x64.Build.0 = Debug|x64
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Debug|x86.ActiveCfg = Debug|Win32
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Debug|x86.Build.0 = Debug|Win32
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Release|x64.ActiveCfg = Release|x64
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Release|x64.Build.0 = Release|x64
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Release|x86.ActiveCfg = Release|Win32
+		{7E03CE25-F824-46E8-808F-D5E5FB4D8485}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
