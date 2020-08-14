@@ -31,7 +31,7 @@ int main()
 #if 0
 	collecting_apples(n, m);
 #else
-	collecting_apples_recursively(0, 0);
+	collecting_apples_recursively2(n - 1, m - 1);
 #endif
 
 	std::cout << "dp:" << std::endl;

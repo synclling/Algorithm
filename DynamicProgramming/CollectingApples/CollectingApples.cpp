@@ -30,9 +30,10 @@ void collecting_apples(int n, int m)
 }
 
 
-// Recursively 
-// start with: collecting_apples_recursively(0, 0);
-void collecting_apples_recursively(int x, int y)
+// Recursively1
+// start with: collecting_apples_recursively1(0, 0);
+// recrusively: from (0, 0) to (n - 1, m - 1)
+void collecting_apples_recursively1(int x, int y)
 {
 	dp[x][y] = a[x][y];
 
@@ -51,11 +52,43 @@ void collecting_apples_recursively(int x, int y)
 
 	if (x < n - 1)
 	{
-		collecting_apples_recursively(x + 1, y);
+		collecting_apples_recursively1(x + 1, y);
 	}
 
 	if (y < m - 1)
 	{
-		collecting_apples_recursively(x, y + 1);
+		collecting_apples_recursively1(x, y + 1);
 	}
+}
+
+// Recursively2
+// start with: collecting_apples_recursively2(n - 1, m - 1);
+// recrusively: from (n - 1, m - 1) to (0, 0)
+void collecting_apples_recursively2(int x, int y)
+{
+	dp[x][y] = a[x][y];
+
+	int max = 0;
+	
+	if (x > 0)
+	{
+		collecting_apples_recursively2(x - 1, y);
+
+		if (max < dp[x - 1][y])
+		{
+			max = dp[x - 1][y];
+		}
+	}
+
+	if (y > 0)
+	{
+		collecting_apples_recursively2(x, y - 1);
+
+		if (max < dp[x][y - 1])
+		{
+			max = dp[x][y - 1];
+		}
+	}
+
+	dp[x][y] += max;
 }
