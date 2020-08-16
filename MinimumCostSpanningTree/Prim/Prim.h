@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#define MAX_VERTEX_NUM 20	
+#define MAX_VERTEX_NUM		20
+#define INTEGER_MAX			0xffff
 
 // -----图的邻接矩阵存储表示-----
 
