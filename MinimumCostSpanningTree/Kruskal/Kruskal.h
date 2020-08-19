@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #define MAX_VERTEX_NUM		20
+#define MAX_ARC_NUM			(MAX_VERTEX_NUM * (MAX_VERTEX_NUM - 1) / 2)
 #define INTEGER_MAX			0xffff
 
 // -----图的邻接矩阵存储表示-----

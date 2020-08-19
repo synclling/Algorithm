@@ -1,25 +1,40 @@
 ﻿#include "Kruskal.h"
 #include <iostream>
 
-// -----辅助结构-----
+// -----弧信息-----
 // 记录弧的邻接顶点和权值
 typedef struct Arc
 {
-	VertexType	u;
-	VertexType	v;
-	VRType		w;
+	int		u;	// 顶点u在G.vexs[]的index
+	int		v;	// 顶点v在G.vexs[]的index
+	VRType	w;
 } Arc;
 
 void ArcSwap(Arc arr[], int i, int j)
 {
 	Arc temp = arr[i];
-	arr[j] = arr[i];
-	arr[i] = temp;
+	arr[i] = arr[j];
+	arr[j] = temp;
 }
 
-void ArcSort(Arc arr[], int n)
+void ArcSort(Arc arr[], int n)	// 选择排序
 {
+	int i, j;
+	int index;
 
+	for (i = 0; i < n - 1; ++i)
+	{
+		index = i;
+		
+		for (j = i + 1; j < n; ++j)
+		{
+			if (arr[j].w < arr[index].w)
+				index = j;
+		}
+
+		if (index != i)
+			ArcSwap(arr, i, index);
+	}
 }
 
 int LocateVex(const MGraph &G, VertexType v)
@@ -31,6 +46,7 @@ int LocateVex(const MGraph &G, VertexType v)
 
 	return -1;
 }
+
 
 
 void CreateMGraph(MGraph &G)
@@ -69,5 +85,45 @@ void CreateMGraph(MGraph &G)
 
 void MiniSpanTree_Kruskal(const MGraph &G)
 {
+	int i, j;
+	
+	Arc arr[MAX_ARC_NUM];			// 记录G所有的弧
+	int vertexs[MAX_VERTEX_NUM];	// 记录每个顶点集的变化
 
+	int k = 0;
+	for (i = 0; i < G.vexnum - 1; ++i)
+	{
+		for (j = i + 1; j < G.vexnum; ++j)
+		{
+			if (G.arcs[i][j].adj < INTEGER_MAX)
+			{
+				arr[k].u = i;
+				arr[k].v = j;
+				arr[k].w = G.arcs[i][j].adj;
+				++k;
+			}
+		}
+	}
+
+	ArcSort(arr, G.arcnum); // 按权值从小到大排序
+
+	// 初始: 每个顶点各为一个集合
+	for (i = 0; i < G.vexnum; ++i)
+		vertexs[i] = i;
+
+
+	for (k = 0; k < G.arcnum; ++k)
+	{
+		int s1 = vertexs[arr[k].u];
+		int s2 = vertexs[arr[k].v];
+		if (s1 != s2)
+		{
+			std::cout << "(" << G.vexs[arr[k].u] << ", " << G.vexs[arr[k].v] << ")" << std::endl;
+			// 合并顶点集
+			for (i = 0; i < G.vexnum; ++i)
+			{
+				if (vertexs[i] == s2)	vertexs[i] = s1;
+			}
+		}
+	}
 }
