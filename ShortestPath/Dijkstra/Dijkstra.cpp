@@ -14,6 +14,19 @@ int LocateVex(const MGraph &G, VertexType v)
 void CreateMGraph(MGraph &G)
 {
 	int i, j, k;
+	int kind;
+
+	std::cout << "请输入图的种类(0:有向图, 1:无向图): ";
+	std::cin >> kind;
+	if (kind == 0)
+	{
+		G.kind = DG;
+	}
+	else if (kind == 1)
+	{
+		G.kind = UDG;
+	}
+
 	std::cout << "请输入图的顶点数和弧数: ";
 	std::cin >> G.vexnum >> G.arcnum;
 
@@ -40,7 +53,16 @@ void CreateMGraph(MGraph &G)
 		std::cin >> vi >> vj >> w;
 		i = LocateVex(G, vi);
 		j = LocateVex(G, vj);
+		G.arcs[i][j].adj = w;
 
-		G.arcs[i][j].adj = G.arcs[j][i].adj = w;
+		if (G.kind == UDG)
+		{
+			G.arcs[j][i].adj = G.arcs[i][j].adj;
+		}
 	}
+}
+
+void ShortestPath(const MGraph &G, VertexType v0)
+{
+
 }
