@@ -9,14 +9,8 @@
 typedef int		VRType;
 // VertexType: 顶点类型
 typedef char	VertexType;
-
-typedef enum
-{
-	DG,		// 有向图
-	UDG,	// 无向图
-	DN,		// 有向网
-	UDN		// 无向网
-} GraphKind;
+// GraphKind: 图的类型
+typedef enum{ DG, UDG, DN, UDN } GraphKind; // 有向图，无向图，有向网，无向网
 
 typedef struct ArcCell
 {
@@ -26,11 +20,20 @@ typedef struct ArcCell
 
 typedef struct MGraph
 {
-	GraphKind	kind;					// 图的类型: 有向图、无向图、有向网、无向网*/
+	GraphKind	kind;					// 图的类型
 	int	vexnum, arcnum;					// 图的当前顶点数和弧数
 	VertexType	vexs[MAX_VERTEX_NUM];	// 顶点向量
 	AdjMatrix	arcs;					// 弧的邻接矩阵
 } MGraph;
+
+// -----辅助数据结构-----
+
+// ShortPathTable[i]表示当前找到的从源点V到每个终点Vi的最短路径的长度
+typedef VRType ShortPathTable[MAX_VERTEX_NUM];
+// 
+typedef bool PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+// final[v]为true时
+typedef bool final[MAX_VERTEX_NUM];
 
 void CreateMGraph(MGraph &G);
 
