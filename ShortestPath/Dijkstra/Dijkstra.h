@@ -29,7 +29,6 @@ typedef struct MGraph
 } MGraph;
 
 
-
 // -----辅助数据结构-----
 
 // ShortPathTable[i]表示当前找到的从源点V到每个终点Vi的最短路径的长度
@@ -38,7 +37,6 @@ typedef VRType ShortPathTable[MAX_VERTEX_NUM];
 typedef bool PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 // final[v]为true，表示已经求得源点v0到v的最短路径
 typedef bool Final[MAX_VERTEX_NUM];
-
 
 
 

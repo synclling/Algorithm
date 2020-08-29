@@ -3,15 +3,9 @@
 
 Final final;
 
-int LocateVex(const MGraph &G, VertexType v)
-{
-	for (int i = 0; i < G.vexnum; ++i)
-	{
-		if (v == G.vexs[i])	return i;
-	}
-
-	return -1;
-}
+int LocateVex(const MGraph &G, VertexType v);
+void CreateDG(MGraph &G);
+void CreateUDG(MGraph &G);
 
 void CreateMGraph(MGraph &G)
 {
@@ -40,6 +34,70 @@ void CreateMGraph(MGraph &G)
 	default:
 		break;
 	}
+}
+
+void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D)
+{
+	int i, min;
+	int v, w;
+
+	for (v = 0; v < G.vexnum; ++v)
+	{
+		final[v] = false;
+		D[v] = G.arcs[v0][v].adj;
+
+		for (w = 0; w < G.vexnum; ++w)
+			P[v][w] = false;
+
+		if (D[v] < INTEGER_MAX)
+		{
+			P[v][v0] = true;
+			P[v][v] = true;
+		}
+	}
+
+	D[v0] = 0;
+	final[v0] = true;
+
+	for (i = 1; i < G.vexnum; ++i)
+	{
+		min = INTEGER_MAX;
+
+		for (w = 0; w < G.vexnum; ++w)
+		{
+			if (!final[w] && D[w] < min)
+			{
+				v = w;
+				min = D[w];
+			}
+		}
+
+		final[v] = true;
+
+		for (w = 0; w < G.vexnum; ++w)
+		{
+			if (!final[w] && (min + G.arcs[v][w].adj) < D[w])
+			{
+				D[w] = min + G.arcs[v][w].adj;
+
+				for (int j = 0; j < G.vexnum; ++j)
+					P[w][j] = P[v][j];
+
+				P[w][w] = true;
+			}
+		}
+	}
+}
+
+
+int LocateVex(const MGraph &G, VertexType v)
+{
+	for (int i = 0; i < G.vexnum; ++i)
+	{
+		if (v == G.vexs[i])	return i;
+	}
+
+	return -1;
 }
 
 void CreateDG(MGraph &G)
@@ -112,58 +170,5 @@ void CreateUDG(MGraph &G)
 		j = LocateVex(G, vj);
 		G.arcs[i][j].adj = w;
 		G.arcs[j][i].adj = G.arcs[i][j].adj;
-	}
-}
-
-void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D)
-{
-	int i, min;
-	int v, w;
-
-	for (v = 0; v < G.vexnum; ++v)
-	{
-		final[v] = false;
-		D[v] = G.arcs[v0][v].adj;
-
-		for (w = 0; w < G.vexnum; ++w)
-			P[v][w] = false;
-
-		if (D[v] < INTEGER_MAX)
-		{
-			P[v][v0] = true;
-			P[v][v] = true;
-		}
-	}
-
-	D[v0] = 0;
-	final[v0] = true;
-
-	for (i = 1; i < G.vexnum; ++i)
-	{
-		min = INTEGER_MAX;
-
-		for (w = 0; w < G.vexnum; ++w)
-		{
-			if (!final[w] && D[w] < min)
-			{
-				v = w;
-				min = D[w];
-			}
-		}
-
-		final[v] = true;
-
-		for (w = 0; w < G.vexnum; ++w)
-		{
-			if (!final[w] && (min + G.arcs[v][w].adj) < D[w])
-			{
-				D[w] = min + G.arcs[v][w].adj;
-
-				for (int j = 0; j < G.vexnum; ++j)
-					P[w][j] = P[v][j];
-
-				P[w][w] = true;
-			}
-		}
 	}
 }

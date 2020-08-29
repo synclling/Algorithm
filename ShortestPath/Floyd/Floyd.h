@@ -27,3 +27,17 @@ typedef struct MGraph
 	VertexType	vexs[MAX_VERTEX_NUM];	// 顶点向量
 	AdjMatrix	arcs;					// 弧的邻接矩阵
 } MGraph;
+
+
+// -----辅助数据结构-----
+
+// DistanceMatrix[v][w]记录每个顶点v到其余顶点w的最短路径长度
+typedef VRType DistanceMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+// PathMatrix[v][w][u]为true，则u是从v到w当前求得最短路径上的顶点
+typedef bool PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+
+
+
+void CreateMGraph(MGraph &G);
+
+void ShortestPath(const MGraph &G, PathMatrix &P, DistanceMatrix &D);
