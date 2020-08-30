@@ -2,10 +2,19 @@
 //
 
 #include <iostream>
+#include "Floyd.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	MGraph G;
+	PathMatrix P;
+	DistanceMatrix D;
+
+	CreateMGraph(G);
+	ShortestPath(G, P, D);
+	PrintPath(G, P, D);
+
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

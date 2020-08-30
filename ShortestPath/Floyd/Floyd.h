@@ -17,7 +17,7 @@ typedef struct {} InfoType;
 typedef struct ArcCell
 {
 	VRType		adj;	// VRType顶点关系类型。对于带权图，为权值类型。
-	InfoType	*info;	// 该弧相关信息的指针，可以忽略
+	/*InfoType	*info;	// 该弧相关信息的指针，可以忽略*/
 } ArcCell, AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 
 typedef struct MGraph
@@ -41,3 +41,5 @@ typedef bool PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 void CreateMGraph(MGraph &G);
 
 void ShortestPath(const MGraph &G, PathMatrix &P, DistanceMatrix &D);
+
+void PrintPath(const MGraph &G, const PathMatrix &P, const DistanceMatrix &D);
