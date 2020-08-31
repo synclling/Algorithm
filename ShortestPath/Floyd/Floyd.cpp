@@ -96,10 +96,10 @@ void PrintPath(const MGraph &G, const PathMatrix &P, const DistanceMatrix &D)
 {
 	int i, j, k;
 
-	// temp[]记录从vi到vj路径中的中间顶点的顺序，temp[0]为中间顶点的个数
-	int temp[MAX_VERTEX_NUM];
-	// count[i][j]记录从vi到vj路径中的所有顶点个数，包括vi, vj
+	// count[i][j]记录从vi到vj路径中经过的所有顶点个数，包括vi，vj
 	int count[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
+	// order[]记录从vi到vj路径中的中间顶点的顺序，order[0]存储中间顶点的个数
+	int order[MAX_VERTEX_NUM + 1];
 
 	for (i = 0; i < G.vexnum; ++i)
 	{
@@ -108,7 +108,7 @@ void PrintPath(const MGraph &G, const PathMatrix &P, const DistanceMatrix &D)
 			count[i][j] = 0;
 			for (k = 0; k < G.vexnum; ++k)
 			{
-				if (P[i][j][k]) // 第k顶点为true
+				if (P[i][j][k]) // 第k顶点为路径上的顶点
 				{
 					count[i][j]++;
 				}
@@ -125,33 +125,33 @@ void PrintPath(const MGraph &G, const PathMatrix &P, const DistanceMatrix &D)
 				std::cout << G.vexs[i] << "到" << G.vexs[j] << "的最短路径为: ";
 				if (count[i][j] > 0)
 				{
-					// 采用直接插入排序为从vi到vj路径中的中间顶点排序
-					temp[0] = 0;
-					for(k = 0; k < G.vexnum; ++k)
-						if (k != i && k != j && P[i][j][k])
+					order[0] = 0;
+					for (k = 0; k < G.vexnum; ++k)
+						if (k != i && k != j && P[i][j][k]) // 只扫描中间顶点
 						{
-							int m = temp[0];
-							while (m > 0 && count[i][k] < count[i][temp[m]])
+							int m = order[0];
+							// 采用直接插入排序为vi到vj的中间顶点排序
+							while (m > 0 && count[i][k] < count[i][order[m]])
 							{
-								temp[m + 1] = temp[m];
+								order[m + 1] = order[m];
 								--m;
 							}
-							temp[m + 1] = k;
-							temp[0]++;
+							order[m + 1] = k;
+							order[0]++;
 						}
 					// 输出
-					std::cout << G.vexs[i] << " ";
-					for (int t = 1; t <= temp[0]; ++t)
-						std::cout << G.vexs[temp[t]] << " ";
+					std::cout << G.vexs[i] << "→";
+					for (int t = 1; t <= order[0]; ++t)
+						std::cout << G.vexs[order[t]] << "→";
 					std::cout << G.vexs[j] << ", ";
 				}
 				else
 				{
-					std::cout << "x, ";
+					std::cout << "×, ";
 				}
 
 				std::cout << "权值为: ";
-				if (0 < D[i][j] && D[i][j] < INTEGER_MAX)
+				if (D[i][j] < INTEGER_MAX)
 					std::cout << D[i][j] << std::endl;
 				else
 					std::cout << "∞" << std::endl;
@@ -160,6 +160,7 @@ void PrintPath(const MGraph &G, const PathMatrix &P, const DistanceMatrix &D)
 		std::cout << std::endl;
 	}
 }
+
 
 
 

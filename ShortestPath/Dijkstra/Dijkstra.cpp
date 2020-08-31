@@ -1,11 +1,9 @@
 ﻿#include "Dijkstra.h"
 #include <iostream>
 
-Final final;
-
-int LocateVex(const MGraph &G, VertexType v);
 void CreateDG(MGraph &G);
 void CreateUDG(MGraph &G);
+
 
 void CreateMGraph(MGraph &G)
 {
@@ -40,6 +38,8 @@ void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D)
 {
 	int i, min;
 	int v, w;
+
+	Final final;
 
 	for (v = 0; v < G.vexnum; ++v)
 	{
@@ -76,7 +76,7 @@ void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D)
 
 		for (w = 0; w < G.vexnum; ++w)
 		{
-			if (!final[w] && (min + G.arcs[v][w].adj) < D[w])
+			if (!final[w] && ((min + G.arcs[v][w].adj) < D[w]))
 			{
 				D[w] = min + G.arcs[v][w].adj;
 
@@ -89,16 +89,69 @@ void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D)
 	}
 }
 
-
-int LocateVex(const MGraph &G, VertexType v)
+void PrintPath(const MGraph &G, int v0, const PathMatrix &P, const ShortPathTable &D)
 {
-	for (int i = 0; i < G.vexnum; ++i)
+	int i, j, k;
+
+	// count[i]记录从源点v0到vi路径中经过的所有顶点个数，包括v0，vi
+	int count[MAX_VERTEX_NUM];
+	// order[]记录从源点v0到vi路径中的中间顶点的顺序，order[0]存储中间顶点的个数
+	int order[MAX_VERTEX_NUM + 1];
+
+	for (i = 0; i < G.vexnum; ++i)
 	{
-		if (v == G.vexs[i])	return i;
+		count[i] = 0;
+		for (j = 0; j < G.vexnum; ++j)
+		{
+			if (P[i][j]) // 第j顶点为路径上的顶点
+			{
+				count[i]++;
+			}
+		}
 	}
 
-	return -1;
+	for (i = 0; i < G.vexnum; ++i)
+	{
+		if (i != v0)
+		{
+			std::cout << G.vexs[v0] << "到" << G.vexs[i] << "的最短路径为: ";
+			if (count[i] > 0)
+			{
+				order[0] = 0;
+				for (j = 0; j < G.vexnum; ++j)
+					if (j != v0 && j != i && P[i][j]) // 只扫描中间顶点
+					{
+						int m = order[0];
+						// 采用直接插入排序为v0到vi的中间顶点排序
+						while (m > 0 && count[j] < count[order[m]])
+						{
+							order[m + 1] = order[m];
+							--m;
+						}
+						order[m + 1] = j;
+						order[0]++;
+					}
+				// 输出
+				std::cout << G.vexs[v0] << "→";
+				for (k = 1; k <= order[0]; ++k)
+					std::cout << G.vexs[order[k]] << "→";
+				std::cout << G.vexs[i] << ", ";
+			}
+			else
+			{
+				std::cout << "×, ";
+			}
+
+			std::cout << "权值为: ";
+			if (D[i] < INTEGER_MAX)
+				std::cout << D[i] << std::endl;
+			else
+				std::cout << "∞" << std::endl;
+		}
+	}
 }
+
+
 
 void CreateDG(MGraph &G)
 {
@@ -171,4 +224,14 @@ void CreateUDG(MGraph &G)
 		G.arcs[i][j].adj = w;
 		G.arcs[j][i].adj = G.arcs[i][j].adj;
 	}
+}
+
+int LocateVex(const MGraph &G, VertexType v)
+{
+	for (int i = 0; i < G.vexnum; ++i)
+	{
+		if (v == G.vexs[i])	return i;
+	}
+
+	return -1;
 }

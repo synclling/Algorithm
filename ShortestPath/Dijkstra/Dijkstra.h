@@ -17,7 +17,7 @@ typedef struct{} InfoType;
 typedef struct ArcCell
 {
 	VRType		adj;	// VRType顶点关系类型。对于带权图，为权值类型。
-	InfoType	*info;	// 该弧相关信息的指针，可以忽略
+	/*InfoType	*info;	// 该弧相关信息的指针，可以忽略*/
 } ArcCell, AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 
 typedef struct MGraph
@@ -31,7 +31,7 @@ typedef struct MGraph
 
 // -----辅助数据结构-----
 
-// ShortPathTable[i]表示当前找到的从源点V到每个终点Vi的最短路径的长度
+// ShortPathTable[i]表示当前找到的从源点v0到每个终点vi的最短路径的长度
 typedef VRType ShortPathTable[MAX_VERTEX_NUM];
 // PathMatrix[v][w]为true，则w是从源点v0到v当前求得最短路径上的顶点
 typedef bool PathMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
@@ -43,3 +43,7 @@ typedef bool Final[MAX_VERTEX_NUM];
 void CreateMGraph(MGraph &G);
 
 void ShortestPath(const MGraph &G, int v0, PathMatrix &P, ShortPathTable &D);
+
+void PrintPath(const MGraph &G, int v0, const PathMatrix &P, const ShortPathTable &D);
+
+int LocateVex(const MGraph &G, VertexType v);

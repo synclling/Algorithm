@@ -2,10 +2,27 @@
 //
 
 #include <iostream>
+#include "Dijkstra.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	MGraph G;
+	PathMatrix P;
+	ShortPathTable D;
+
+	VertexType v0;
+
+	CreateMGraph(G);
+
+	std::cout << "请输入源点v0: ";
+	std::cin >> v0;
+
+	int index = LocateVex(G, v0);
+
+	ShortestPath(G, index, P, D);
+	PrintPath(G, index, P, D);
+
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
