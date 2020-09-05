@@ -8,7 +8,8 @@ typedef struct HuffmanTreeNode
 {
 	unsigned int weight;
 	unsigned int parent, lchild, rchild;
-} HTNode, *HuffmanTree;
+	HuffmanTreeNode(unsigned int w, unsigned int p, unsigned int l, unsigned int r) : weight(w), parent(p), lchild(l), rchild(r) {}
+} HuffmanTreeNode, *HuffmanTree;
 
 typedef char** HuffmanCode;
 
@@ -19,4 +20,4 @@ typedef char** HuffmanCode;
  *	@param	[in]w		w存放n个字符的权值(均大于0)
  *	@param	[in]n		n个字符
  */
-void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, int *w, int n);
+void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n);

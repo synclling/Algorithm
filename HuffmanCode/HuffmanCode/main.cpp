@@ -2,10 +2,22 @@
 //
 
 #include <iostream>
+#include "HuffmanCode.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	HuffmanTree HT;
+	HuffmanCode HC;
+
+	unsigned int w[] = { 5, 29, 7, 8, 14, 23, 3, 11 };
+	int n = sizeof(w) / sizeof(int);
+
+	HuffmanCoding(HT, HC, w, n);
+
+	for (int i = 1; i <= n; ++i)
+		std::cout << HC[i] << std::endl;
+
+	return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
