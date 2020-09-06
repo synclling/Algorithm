@@ -96,9 +96,9 @@ void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n)
 		HT[i].weight = HT[s1].weight + HT[s2].weight;
 	}
 
-
+#if 0
 	// ---从叶子结点到根逆向求每个字符的Huffman编码
-	HC = (HuffmanCode)malloc((n + 1) * sizeof(char *));
+	HC = (HuffmanCode)malloc((n + 1) * sizeof(char *)); // 0号单元未用
 
 	char *code = (char *)malloc(n * sizeof(char));
 	code[n - 1] = '\0';
@@ -118,4 +118,56 @@ void HuffmanCoding(HuffmanTree &HT, HuffmanCode &HC, unsigned int *w, int n)
 	}
 
 	free(code);
+#else
+	// ---从根结点出发遍历整个Huffman tree求每个字符的Huffman编码
+	HC = (HuffmanCode)malloc((n + 1) * sizeof(char *)); // 0号单元未用
+
+	char *code = (char *)malloc(n * sizeof(char));
+	int cdlen = 0;
+
+	unsigned int p = m; // 指向根结点
+
+	for (i = 1; i <= m; ++i)
+		HT[i].weight = 0; // 遍历Huffman tree时用作结点状态标志
+
+	while (p != 0)
+	{
+		if (HT[p].weight == 0) // 向左
+		{
+			HT[p].weight = 1;
+
+			if (HT[p].lchild != 0) // 有左孩子结点
+			{
+				p = HT[p].lchild;
+				code[cdlen++] = '0';
+			}
+			else // 叶子结点
+			{
+				HC[p] = (char *)malloc((cdlen + 1) * sizeof(char));
+
+				code[cdlen] = '\0';
+				for (int j = 0; j <= cdlen; ++j)
+					HC[p][j] = code[j];
+			}
+		}
+		else if (HT[p].weight == 1) // 向右
+		{
+			HT[p].weight = 2;
+
+			if (HT[p].rchild != 0) // 有右孩子结点
+			{
+				p = HT[p].rchild;
+				code[cdlen++] = '1';
+			}
+		}
+		else // HT[p].weight == 2，回退
+		{
+			HT[p].weight = 0;
+			p = HT[p].parent; // 退回父结点，编码长度减1
+			--cdlen;
+		}
+	}
+
+	free(code);
+#endif
 }
