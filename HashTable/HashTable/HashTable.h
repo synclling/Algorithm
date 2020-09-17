@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define HASH_TABLE_LENGTH 100	
+#define HASH_TABLE_LENGTH 128	
 
 typedef int DataType;
 
@@ -16,4 +16,12 @@ typedef struct HashTable
 } HashTable;
 
 
-void CreateHashTable(HashTable &hashtable);
+HashTable* CreateHashTable();
+
+int Hash(DataType data);
+
+Node *Search(const HashTable *hashtable, DataType data);
+
+int Insert(HashTable *hashtable, DataType data);
+
+int Delete(HashTable *hashtable, DataType data);
